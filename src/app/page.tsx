@@ -152,7 +152,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-6 bg-background">
-      <div className={`w-full transition-all duration-500 ease-in-out ${svgResult ? "max-w-fit" : "max-w-lg"}`}>
+      <div className={`w-full transition-all duration-500 ease-in-out ${svgResult ? "max-w-fit" : "max-w-lg flex justify-center"}`}>
         <div className={`flex transition-all duration-500 ease-in-out ${svgResult ? "flex-col lg:flex-row gap-6 items-center lg:items-stretch" : "flex-col items-center"}`}>
           {formCard}
           {svgResult && (
