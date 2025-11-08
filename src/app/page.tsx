@@ -54,14 +54,28 @@ export default function Home() {
     }
   }
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center p-6 bg-background">
-      <Card className="w-full max-w-xl">
-        <CardHeader>
-          <CardTitle>Nice QR Maker</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-6">
+  function handleDownload() {
+    if (!svgResult) return;
+    
+    const blob = new Blob([svgResult], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "qrcode.svg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  const formCard = (
+    <Card className="w-full max-w-lg lg:w-[400px] lg:min-w-[400px] lg:self-stretch flex flex-col transition-all duration-500 ease-in-out">
+      <CardHeader>
+        <CardTitle>QR Maker by @itsnicknorton</CardTitle>
+      </CardHeader>
+      <form onSubmit={onSubmit} className="flex flex-col flex-1">
+        <CardContent className="flex-1">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="qrData">QR Data (url)</Label>
               <Input id="qrData" placeholder="https://example.com" value={qrData} onChange={(e) => setQrData(e.target.value)} required />
@@ -82,7 +96,7 @@ export default function Home() {
             <div className="space-y-2">
               <Label>Finder frame shape</Label>
               <Select value={finderFrame} onValueChange={setFinderFrame}>
-                <SelectTrigger><SelectValue placeholder="Select shape" /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select shape" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="square">square</SelectItem>
                   <SelectItem value="rounded">rounded</SelectItem>
@@ -96,7 +110,7 @@ export default function Home() {
             <div className="space-y-2">
               <Label>Finder center shape</Label>
               <Select value={finderCenter} onValueChange={setFinderCenter}>
-                <SelectTrigger><SelectValue placeholder="Select shape" /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select shape" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="square">square</SelectItem>
                   <SelectItem value="rounded">rounded</SelectItem>
@@ -110,7 +124,7 @@ export default function Home() {
             <div className="space-y-2">
               <Label>Module shape</Label>
               <Select value={moduleShape} onValueChange={setModuleShape}>
-                <SelectTrigger><SelectValue placeholder="Select shape" /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select shape" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="square">square</SelectItem>
                   <SelectItem value="rounded">rounded</SelectItem>
@@ -119,29 +133,47 @@ export default function Home() {
                 </SelectContent>
               </Select>
             </div>
-
-            <CardFooter className="px-0">
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Generating..." : "Submit"}
-              </Button>
-            </CardFooter>
-          </form>
+          </div>
           
           {error && (
             <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md">
               <p className="text-sm">{error}</p>
             </div>
           )}
-          
-          {svgResult && (
-            <div className="mt-6 space-y-4">
-              <div className="flex justify-center p-4 bg-muted rounded-md">
-                <div dangerouslySetInnerHTML={{ __html: svgResult }} />
-              </div>
-            </div>
-          )}
         </CardContent>
-      </Card>
+        <CardFooter className="mt-4">
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Generating..." : "Submit"}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
+  );
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center p-6 bg-background">
+      <div className={`w-full transition-all duration-500 ease-in-out ${svgResult ? "max-w-fit" : "max-w-lg"}`}>
+        <div className={`flex transition-all duration-500 ease-in-out ${svgResult ? "flex-col lg:flex-row gap-6 items-center lg:items-stretch" : "flex-col items-center"}`}>
+          {formCard}
+          {svgResult && (
+            <Card className="w-fit lg:min-w-[400px] lg:self-stretch flex flex-col animate-[fadeIn_0.5s_ease-in-out_forwards] lg:animate-[fadeInSlide_0.5s_ease-in-out_forwards]">
+              <CardHeader>
+                <CardTitle>QR Code</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <div className="flex justify-center p-4 bg-muted rounded-md">
+                  <div dangerouslySetInnerHTML={{ __html: svgResult }} />
+                </div>
+              </CardContent>
+              <CardFooter className="mt-4">
+                <Button onClick={handleDownload} className="w-full">
+                  Download SVG
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
