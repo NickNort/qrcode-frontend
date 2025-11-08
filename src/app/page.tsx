@@ -19,12 +19,39 @@ export default function Home() {
   const [finderFrame, setFinderFrame] = useState("square");
   const [finderCenter, setFinderCenter] = useState("square");
   const [moduleShape, setModuleShape] = useState("square");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [svgResult, setSvgResult] = useState<string | null>(null);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSvgResult(null);
+    
     const payload = { qrData, backgroundColor: bg, foregroundColor: fg, finderFrame, finderCenter, moduleShape };
-    console.log("Submit payload", payload);
-    // TODO: send to API (e.g., fetch('/api/qrcode', { method: 'POST', body: JSON.stringify(payload) }))
+    
+    try {
+      const response = await fetch("/api/qrcode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Request failed" }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      const svg = await response.text();
+      setSvgResult(svg);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -94,9 +121,25 @@ export default function Home() {
             </div>
 
             <CardFooter className="px-0">
-              <Button type="submit" className="w-full">Submit</Button>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Generating..." : "Submit"}
+              </Button>
             </CardFooter>
           </form>
+          
+          {error && (
+            <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md">
+              <p className="text-sm">{error}</p>
+            </div>
+          )}
+          
+          {svgResult && (
+            <div className="mt-6 space-y-4">
+              <div className="flex justify-center p-4 bg-muted rounded-md">
+                <div dangerouslySetInnerHTML={{ __html: svgResult }} />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
