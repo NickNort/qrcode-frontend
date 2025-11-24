@@ -71,7 +71,7 @@ export default function Home() {
   const formCard = (
     <Card className="w-full max-w-lg lg:w-[400px] lg:min-w-[400px] lg:self-stretch flex flex-col transition-all duration-500 ease-in-out">
       <CardHeader>
-        <CardTitle>QR Maker by @itsnicknorton</CardTitle>
+        <CardTitle>QR Maker by @kazylnn</CardTitle>
       </CardHeader>
       <form onSubmit={onSubmit} className="flex flex-col flex-1">
         <CardContent className="flex-1">
