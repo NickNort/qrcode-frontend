@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "qrcode - nickn.dev",
-  description: "Pretty QR Code Generator made by @itsnicknorton",
+  description: "Pretty QR Code Generator made by @kazylnn",
   icons: [],
 };
 
